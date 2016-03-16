@@ -1,0 +1,8 @@
+range for Debian
+----------------
+
+range is a front-end to various stopping power and range calculating
+functions. The header and static library needed to access two of the
+functions are packaged separately in package range-dev.
+
+ -- Ricardo Yanez <ricardo.yanez@calel.org>, Mon, 17 Jan 2005 20:58:22 +1100

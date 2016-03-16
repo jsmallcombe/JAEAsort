@@ -1,0 +1,1 @@
+tar -hpczf analysis_package_2_0.tar.gz  --exclude='*~' --exclude='*box*' --exclude='*.zip' --exclude='*tar.gz' --exclude='compress.txt' analysis_package_2_0

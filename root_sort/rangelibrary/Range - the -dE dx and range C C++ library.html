@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0031)http://www.calel.org/range.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Range - the -dE/dx and range C/C++ library</title>
+	<meta name="author" content="">
+	<meta name="GENERATOR" content="Almost Free Text v5.097; Copyright 1996-2009 Todd Coram.">
+<style type="text/css">
+  <!--
+	.section5 { padding-left: 50pt; }
+	.section6 { padding-left: 75pt; }
+	.section7 { padding-left: 100pt; }
+html { background: #eee; color: #000; }
+
+body { background: #eee; color: #000; margin: 0; padding: 0;}
+
+div.body {
+	background: #fff; color: #000;
+	margin: 0.3em 1em 0.3em 1em; padding: 1em;
+	font-family: Verdana, Arial, Helvetica, serif;
+	font-size: 0.9em; line-height: 1.3em;
+	border-width: 1px 1px 1px 1px;
+	border-style: solid;
+	border-color: #aaa;
+}
+
+div.block {
+	background: #F8F8FF; color: #000;
+	margin: 1em; padding: 0 1em 0 1em;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #909090;
+}
+
+table {
+	background: #F8F8F8; color: #000;
+	margin: 1em;
+	border-width: 0 0 0 1px;
+	border-style: solid;
+	border-color: #C0C0C0;
+}
+
+td {
+	border-width: 0 1px 1px 0;
+	border-style: solid;
+	border-color: #C0C0C0;
+}
+
+th {
+	background: #F8F8FF;
+	border-width: 1px 1px 2px 0;
+	border-style: solid;
+	border-color: #C0C0C0;
+}
+
+
+/* body text, headings, and rules */
+
+p { margin: 0; text-indent: 0em; margin: 0 0 0.5em 0 }
+
+h1, h2, h3, h4, h5, h6 {
+	color: #206020; background: transparent;
+	font-family: Verdana, Arial, Helvetica, serif;
+	font-weight: normal;
+}
+
+/*
+h1 { font-size: 1.69em; margin: 1.4em 0 0.4em 0; }
+h2 { font-size: 1.44em; margin: 1.4em 0 0.4em 0; }
+h3 { font-size: 1.21em; margin: 1.4em 0 0.4em 0; }
+h4 { font-size: 1.00em; margin: 1.4em 0 0.4em 0; }
+h5 { font-size: 0.81em; margin: 1.4em 0 0.4em 0; }
+h6 { font-size: 0.64em; margin: 1.4em 0 0.4em 0; }
+*/
+
+hr {
+	color: transparent; background: transparent;
+	height: 0px; margin: 0.6em 0;
+	border-width: 1px ;
+	border-style: solid;
+	border-color: #999;
+}
+
+/* bulleted lists and definition lists */
+
+ul { margin: 0 1em 0.6em 2em; padding: 0; }
+li { margin: 0.4em 0 0 0; }
+
+dl { margin: 0.6em 1em 0.6em 2em; }
+dt { color: #206020; }
+
+tt { color: #602020; }
+
+/* links */
+
+a.link {
+	color: #33c; background: transparent;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #000; background: transparent;
+}
+
+body > a {
+	font-family: Verdana, Arial, Helvetica, serif;
+	font-size: 0.81em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: #206020; background: transparent;
+	font-family: Verdana, Arial, Helvetica, serif;
+	font-weight: normal;
+}
+
+  -->
+</style>
+</head>
+<body data-feedly-mini="yes">
+<div class="body">
+
+<br><center><h1><a name="AFT-top">Range - the -dE/dx and range C/C++ library</a></h1></center>
+<hr>
+<small>by <a target="_blank" href="http://www.calel.org/">Ricardo Yanez</a></small><br><small><b>Last updated:</b> October 5, 2012</small><br><br><p class="Body">
+<strong>range</strong> is a stopping power and range library written in C. It creates 
+and stores in memory range tables based on the Northcliffe-Schilling[1] 
+and Hubert-Bimbot-Gauvin[2] correlations. These can be used to 
+calculate the energy loss of an ion after passage through a foil, or the 
+incoming energy prior to passage based on the outgoing energy.
+</p>
+<p class="Body">
+Since the Northcliffe-Schilling and Hubert-Bimbot-Gauvin correlations 
+are valid for E/A &lt; 12 MeV/A and 2.5 &lt; E/A &lt; 500 MeV/A, respectively, 
+this library is mostly useful in analyzes of nuclear physics experiments 
+in the low (E/A &lt; 10 A MeV) and intermediate (10 &lt; E/A &lt; 150 A MeV) 
+energy regimes, where usually a projectile, or reaction product, loose 
+energy in the target material, dead layers in a detector, or in 
+transmission detectors where only a fraction of the energy is deposited. 
+</p>
+<p class="Body">
+The library consists of four functions, <em>passage()</em>, <em>egassap()</em>, 
+<em>rangen()</em> and <em>thickn()</em>, and the program <em>range</em> which is a 
+front-end useful for quick estimations. The function <em>passage()</em> 
+returns the ion energy after passage through an absorber, whereas 
+<em>egassap()</em> returns the ingoing ion energy, given the energy after 
+passage. If you know the energy of a beam, <em>passage()</em> can be used to 
+calculate the energy deposited in a detector, or the enery lost through 
+a target foil. Similarly, if you know the energy deposited by a reaction 
+product in a detector, <em>egassap()</em> can be used to calculate its 
+initial energy, prior to degradation. The function <em>rangen()</em> returns 
+the range of a projectile in a given material, and the function 
+<em>thickn()</em> returns the foil thickness needed to produce a given energy 
+loss. Manual pages and examples are available.
+</p>
+<!-- Start SectLevel1 -->
+<h2><a name="License">License</a></h2>
+<p class="Body">
+<strong>range</strong> is free software; you can redistribute it and/or modify it under 
+the terms of the GNU General Public License as published by the Free 
+Software Foundation; either version 2, or (at your option) any later 
+version.
+</p>
+<p class="Body">
+This is distributed in the hope that it will be useful, but without any 
+warranty; without even the implied warranty of merchantability or 
+fitness for a particular purpose. See the GNU General Public License for 
+more details.
+</p>
+<!--End Section 1-->
+<h2><a name="Download">Download</a></h2>
+<p class="Body">
+File: <a class="link" href="http://www.calel.org/range-0.1.5.tar.gz">range-0.1.5.tar.gz</a>
+</p>
+<p class="Body">
+Size: 546484 bytes
+</p>
+<p class="Body">
+MD5 checksum: 16315fdc8aba8bd2d292bbb3497f7a04
+</p>
+<!--End Section 1-->
+<h2><a name="Install">Install</a></h2>
+<p class="Body">
+Untar the source,
+</p>
+<div class="block"><pre>$ tar -zxvf range-0.1.5.tar.gz
+</pre></div>
+<p class="Body">
+For a basic installation do shell commands,
+</p>
+<div class="block"><pre>$ cd range-0.1.5
+$ ./configure
+$ make
+$ sudo make install
+$ sudo ldconfig
+</pre></div>
+<p class="Body">
+Do 
+</p><div class="block"><pre>$ ./configure --help
+</pre></div>
+for more configuration options.
+<p></p>
+<p class="Body">
+On Debian systems, read INSTALL.Debian for a Debian-wise installation.
+</p>
+<!--End Section 1-->
+<h2><a name="Usage">Usage</a></h2>
+<p class="Body">
+Do '<tt>man range</tt>' to see the synopsis and description of the range 
+program.
+</p>
+<p class="Body">
+Do '<tt>man 3 range</tt>' to see the synopsis and description of the range 
+functions.
+</p>
+<!--End Section 1-->
+<h2><a name="Example">Example</a></h2>
+<p class="Body">
+Calculate energy loss of alpha particles in air,
+</p>
+<div class="block"><pre>/*
+ * passage.c 
+ *
+ * Written by Ricardo Yanez &lt;ricardo.yanez@calel.org&gt; 
+ *
+ */
+
+#include &lt;stdio.h&gt;
+#include &lt;range.h&gt;
+
+/* Calculate energy loss of alpha particles in air */
+
+int main () {
+
+  int i;
+  double dens, t;
+  double d;
+  double ein, eout, eut, err;
+
+  /* define absorber (air) */
+  nelem = 3;
+  absorb[0].z = 8;  absorb[0].a = 16; absorb[0].w = 2*16*23.2; /* O2 */
+  absorb[1].z = 7;  absorb[1].a = 14; absorb[1].w = 2*14*75.5; /* N2 */
+  absorb[2].z = 18; absorb[2].a = 40; absorb[2].w = 1*40*1.3;  /* Ar */
+
+  /* density of air at 1 atm (see README file) */
+  dens = 760.0 * 5.38083e-5 * (2*16*23.2 + 2*14*75.5 + 1*40*1.3);
+
+  /* If you want to be more accurate you can use molecular weights instead
+     of mass numbers when defining the weights */
+
+  printf("\nCalculating the energy of an alpha particle in air\n\n");
+
+  printf("Initial \t mm of air \t final\n");
+  printf("energy  \t           \t energy\n");
+  printf("(MeV)   \t           \t [1]    \t [2]\n");
+  printf("------- \t --------- \t ------\n");
+  ein = 25.0;
+  for (i = 0 ; i &lt; 10 ; i++) {
+    d = (i+1) / 20.0;
+    t = dens * d;
+    eout = passage(0,2,4,-1,0,0,ein,t,&amp;err);
+    eut = passage(1,2,4,-1,0,0,ein,t,&amp;err);
+    printf("%6.1lf \t\t %6.3lf \t %6.2lf \t %6.2lf\n",ein,d*10.0,eout,eut);
+  }
+
+  printf("\n[1] Northcliffe-Schilling correlations\n");
+  printf("[2] Hubert-Bimbot-Gauvin correlations\n\n");
+
+  return 0;
+
+}
+</pre></div>
+<p class="Body">
+Compile with,
+</p>
+<div class="block"><pre>gcc -g -O -Wall passage.c -lrange -lm -o passage
+</pre></div>
+<p class="Body">
+and run,
+</p>
+<div class="block"><pre>$ ./passage
+
+Calculating the energy of an alpha particle in air
+
+Initial 	 mm of air 	 final
+energy  	           	 energy
+(MeV)   	           	 [1]    	 [2]
+------- 	 --------- 	 ------
+  25.0 		  0.500 	  23.60 	  23.57
+  25.0 		  1.000 	  22.14 	  22.08
+  25.0 		  1.500 	  20.60 	  20.50
+  25.0 		  2.000 	  18.96 	  18.82
+  25.0 		  2.500 	  17.21 	  17.01
+  25.0 		  3.000 	  15.30 	  15.05
+  25.0 		  3.500 	  13.19 	  12.87
+  25.0 		  4.000 	  10.78 	  10.38
+  25.0 		  4.500 	   7.88 	   7.37
+  25.0 		  5.000 	   3.74 	   2.72
+
+[1] Northcliffe-Schilling correlations
+[2] Hubert-Bimbot-Gauvin correlations
+</pre></div>
+<!--End Section 1-->
+<h2><a name="Range and dE/dx in ROOT">Range and dE/dx in ROOT</a></h2>
+<p class="Body">
+To use the range functions in <a class="link" href="http://root.cern.ch/">ROOT</a> load the 
+library with,
+</p>
+<div class="block"><pre>gSystem-&gt;Load("/usr/local/lib/librange")
+</pre></div>
+<p class="Body">
+then compile the code as usual. For example, <a class="link" href="http://www.calel.org/testRange.C">testRange.C</a>,
+</p>
+<div class="block"><pre>root [0] gSystem-&gt;Load("/usr/local/lib/librange")
+root [1] .L testRange.C++
+root [2] testRange()
+98.9758
+119.114
+139.215
+157.807
+263.747
+</pre></div>
+<!--End Section 1-->
+<h2><a name="Notes">Notes</a></h2>
+<p class="Body">
+The method of constructing range tables to interpolate to desired range 
+values is due to Prof. Jan-Olov Liljenzin, Chalmers Institute of 
+Technology, Sweden. The original program written in FORTRAN was 
+inherited to me during my time as a Ph.D. student at Uppsala University. 
+Since the source code was not intended for the general public it was 
+never copyrighted in any sense. I have taken the liberty to port it to C 
+and license it under GPL in the interest of a broader scientific 
+community.
+</p>
+<!--End Section 1-->
+<h2><a name="References">References</a></h2>
+<p class="Body">
+[1] - <a class="link" href="http://www.science-direct.com/science?%3Cstrong%3Eob=ArticleURL&%3C/strong%3Eudi=B6WBB-4MMFK4F-1&%3Cstrong%3Euser=10&%3C/strong%3EcoverDate=01%2F31%2F1970&%3Cstrong%3Erdoc=1&%3C/strong%3Efmt=high&%3Cstrong%3Eorig=browse&%3C/strong%3Esrch=doc-info(%23toc%236706%231970%23999929996%23639911%23FLP%23display%23Volume)&%3Cstrong%3Ecdi=6706&%3C/strong%3Esort=d&%3Cstrong%3Edocanchor=&%3C/strong%3Ect=1&%3Cstrong%3Eacct=C000050221&%3C/strong%3Eversion=1&%3Cstrong%3EurlVersion=0&%3C/strong%3Euserid=10&md5=87a85924c81a02a24a4f3b49186f4e79">C. Northcliffe, R.F. Schilling, Nucl. Data Tables A7, 233 (1970).</a>
+</p>
+<p class="Body">
+[2] - <a class="link" href="http://www.science-direct.com/science?%3Cstrong%3Eob=ArticleURL&%3C/strong%3Eudi=B6WBB-4DTC6N7-1&%3Cstrong%3Euser=10&%3C/strong%3EcoverDate=09%2F30%2F1990&%3Cstrong%3Erdoc=1&%3C/strong%3Efmt=high&%3Cstrong%3Eorig=browse&%3C/strong%3Esrch=doc-info(%23toc%236706%231990%23999539998%23590486%23FLP%23display%23Volume)&%3Cstrong%3Ecdi=6706&%3C/strong%3Esort=d&%3Cstrong%3Edocanchor=&%3C/strong%3Ect=2&%3Cstrong%3Eacct=C000050221&%3C/strong%3Eversion=1&%3Cstrong%3EurlVersion=0&%3C/strong%3Euserid=10&md5=666732a37a26c1a46b0dad235b990c1e">F. Hubert, R. Rimbot and H. Gauvin, Atomic Data and Nuclear Data Tables 46, pp. 1-213 (1990).</a>
+</p>
+<!--End Section 1-->
+<h2><a name="Changelog">Changelog</a></h2>
+<pre>range (0.1.5-2) unstable; urgency=low
+
+  * Fixed natural Ni abundances. Ni-61,62,64 abundances were mistakenly 
+    set 10 times their value. John Frankland of GANIL submitted the bug 
+    report.
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Fri, 05 Oct 2012 13:51:03 -0700
+
+range (0.1.5-1) unstable; urgency=low
+
+  * Added natural Ni as pre-defined compound.
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Mon, 26 Dec 2011 14:18:10 -0800
+
+range (0.1.4-1) unstable; urgency=low
+
+  * Some fixes to code.
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Wed, 15 Dec 2010 17:22:47 -0800
+
+range (0.1.3-1) unstable; urgency=low
+
+  * Added function rangen.
+  * Libraries C++ compatible. Removed librange++.
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Mon, 29 Mar 2010 16:42:46 -0400
+
+range (0.1.2-1) unstable; urgency=low
+
+  * Added function thickn.
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Sun, 08 Nov 2009 07:41:18 -0800
+
+range (0.1.1-1) unstable; urgency=low
+
+  * Improved use of multidimentional array pointers
+  * Shared library compiled with g++ (librange++)
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Sun, 15 Jun 2008 14:19:21 -0400
+
+range (0.1.0-11) unstable; urgency=low
+
+  * Compiled for Etch.
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Mon, 23 Jul 2007 08:30:29 -0400
+
+range (0.1.0-10) unstable; urgency=low
+
+  * Included Copyright notice in codes.
+  * Changed email address
+  * Included LICENSE file in orig.tar.gz
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Sun,  3 Apr 2005 12:53:53 +1000
+
+range (0.1.0-9) unstable; urgency=low
+
+  * Fixed bug: Symbol U.
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Sun, 27 Mar 2005 17:40:35 +1000
+
+range (0.1.0-8) unstable; urgency=low
+
+  * Revised man pages and README
+  * Renamed README to NOTES
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Fri, 25 Mar 2005 21:18:42 +1100
+
+range (0.1.0-7) unstable; urgency=low
+
+  * Fixed header.
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Tue, 15 Feb 2005 17:58:01 +1100
+
+range (0.1.0-6) unstable; urgency=low
+
+  * fixed some typos in manuals.
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Wed, 12 Jan 2005 15:49:11 +1100
+
+range (0.1.0-5) unstable; urgency=low
+
+  * Range table implemented (option 2)
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Fri,  7 Jan 2005 18:17:01 +1100
+
+range (0.1.0-4) unstable; urgency=low
+
+  * Linked range against shared library librange.so
+  * -dE/dx table implemented (option 1)
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Thu, 30 Dec 2004 14:13:25 +1100
+
+range (0.1.0-3) unstable; urgency=low
+
+  * User defined compounds now possible
+  * Added examples
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Sat, 11 Dec 2004 09:03:39 +1100
+
+range (0.1.0-2) unstable; urgency=low
+
+  * Added program range to original static library
+  * Added man pages for range and passage
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Mon,  6 Dec 2004 10:12:19 +1100
+
+range (0.1.0-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Ricardo Yanez &lt;ricardo.yanez@calel.org&gt;  Thu,  2 Dec 2004 16:32:02 +1100
+</pre>
+<img src="http://counter.digits.com/?counter=RicardoYanez&template=simple&hidedigits"><!--End Section 1-->
+<!-- End SectLevel1 -->
+<hr>
+<br>
+<p align="right"> <small>This document was generated using <a class="link" href="http://www.maplefish.com/todd/aft.html">AFT v5.097</a></small> </p>
+
+
+
+</div><div id="feedly-mini" title="feedly Mini tookit"></div></body></html>

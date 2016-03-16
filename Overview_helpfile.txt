@@ -1,0 +1,164 @@
+Analysis Package 2.0
+
+Overview Instructions for instalation and operation 2.0
+
+All of the tools in this package are tested on previously Ubuntu 14.04 and ROOT 6.04
+
+1) Nikiroot (nikirootV2)
+
+    Nikiroot is a self contained event builder program,
+    it can also be run within ROOT (CURRENTLY NOT WORKING).
+    This is my event builder which should be run to turn the raw data
+    files from Nikiglass into basic event ROOT TTrees.
+    The program is designed for flexibility, but with limited knowledge
+    of nikiglass, Makii-san should have an alternative.
+
+    Two main weaknesses of the program:
+    -Time faults (can result in data loss or memory overload)
+    -Low count channels (can result in memory overload)
+
+    There are many layers in place to deal with time faults,
+    but there are still some problems, pay attention to error reports.
+    Avoid including empty channels, because there may still be noise
+    and then entire files may be read into memory.
+
+    From experience I recommend using the y grid of MWPCs as triggers.
+    When using silicon I recommend having MWPC triggered data and
+    silicon triggered data in separate files.
+    As silicon raw is mostly used fo energy calibration use the data
+    reduction options for faster processing.
+
+    TO USE:
+        - Run "cd ..../nikirootV2"
+        - Run "make" to compile the executable
+        - Run "nikiwrapped [COMMANDS]" to sort raw data into intial trees
+          (see nikirootV2/README for instructions on COMMANDS)
+
+2) install root_sort (range-0.1.5 & james_library)
+
+    Firstly install range-0.1.5.tar.gz this provides energy loss calculations
+    I use it at various points, to varying degrees of impact.
+    This is an external library and the only system level install.
+    Secondly there is a makefile in the root_sort/libary folder which will make
+    a ROOT integrable library.
+
+    With libraries loaded like this most of the scripts and selectors will work
+    in interpretive mode.
+
+    TO USE:
+        - Run "cd .../analysis_package_2_0/root_sort/rangelibrary/source" 
+        - Run "./configure"
+        - Run "make"
+        - Run "make install" (if needed "sudo make install")
+        If libtool error: run "autoreconf --force --install", repeat above 3 steps
+        - Run "cd ../../library"
+        - Run "make clean"
+        - Run "make"
+	If you get a library error ensure range lib is correctly sourced in your library path
+        
+3) Position calibration MWPCs (root_sort)
+ 
+    This process is more or less manual currently.
+    Run a root session and chain the TTrees for as many runs from the experiment
+    as needed, for experiments using the backwards MWPCs many runs will be needed
+    to build a decent spectrum. Avoid start of experiment runs.
+    Open a TTree viewer and look at the X & Y of each MWPC, record
+    (either by eye or using fitpanel) the centroid first and last wire peaks.
+
+    TO USE:
+        - Follow section 1)
+        - Run "cd ..../[presorted_data]"
+        - Run "root"
+        - root [0] TChain* chain = new TChain()
+        - root [1] chain->AddFile("run00[N].root",0,"run00[N]"); replacing N
+        - Repeat the above line for desired run set
+        - root [2] chain->StartViewer()
+        - draw MWPC X branches, record first and last peak centroid positions
+        - root [3] .q
+        - Run "cd .../analysis_package_2_0/root_sort"
+        - edit experiment.C
+        - Edit the definition of mwpc_limts array, lines 44-62
+        Order MWPC1(X1,X1,X2,X2,Y1,Y1),MWPC2(X1,X1,X2,X2,Y1,Y1)
+        or MWPC1(X1,X1,Y1,Y1),MWPC2(X1,X1,Y1,Y1),MWPC3(X1,X1,Y1,Y1),MWPC4(X1,X1,Y1,Y1)
+
+4) Time calibrations (root_sort)
+    To run the time calibration we simply run the main sort on a data set with
+    the tzero values in experiment.C set to zero
+    Calculation results are output to terminal.
+    Timing calibration is not currently implemented for long type MWPCs 
+    Figures are saved to root file for manual inspection.
+    Current automatic routine is designed for a symmetric fission calibration point
+
+     TO USE:
+        Follow step 5) omitting final step
+        - Run edit experiment.C
+        - Edit line 66 "double AB=0,BC=0,AD=0;"	
+        - Run "root run.C"
+        - Inspect terminal output and produced .root files
+        to determine time calibration values.
+        - Input values experiment.C, line 66
+
+5) Main sort (root_sort)
+    To run the main sort primarily one only needs to edit experiment.C
+    to select files and input experiment information.
+    Then run root run.C
+    I have included some silicon detector functionality but mostly
+    as a demonstration, the selector is configured for fusion->fission.
+    For transfer fission one will need to adjust data about the
+    compound mass and momentum in several places.
+    It would be easy to implement this with the use of banana gates on
+    silicon dE/E but I never did this as I had no need.
+
+    TO USE:
+        - edit experiment.C
+        - Modify beam, line 6
+        - Modify targets, line 18
+        - Modify detector configuration, line 29+36
+        - Modify directories and files, lines 73-79
+        - Run "root run.C"
+
+6) Analysis (root_sort)
+    Detailed analysis can then continue using the produced sorted root tree.
+    Sharp cuts on phi of folding angle can help eliminate 3 body reactions
+    that should not be included and poor trajectory reconstructions,
+    when statistics are sufficient.
+    Cathode energy gating to remove scattering light particle scattering events
+    can also be added afterwards, use the "AD_BC_swit" branch provided to
+    seperate the different detectors for such gates.
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+SILICON CALIBRATION
+THIS MAY STILL WORK BUT HAS NOT BEEN TESTED FOR SEVERAL VERSIONS
+IT IS LEFT IN THERE AS A SPRINGBOARD FOR ANYONE WISHING TO DEVELOP IT
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+Silicon calibration (root_sort/Si_calib)
+
+    This is mostly automatic.
+    I have tucked the latest versions away in a sub folder as they may break
+    for different experiments as currently written to automatically locate alpha
+    particle track with relation to the lithium beam.
+    Additionally routines to account for dE thickness were also added
+    with varying success, including the latest version which attempts to account
+    for the imprecition of the set up by varying the angle.
+    Currently output calibrations are stored to TTrees in .root files,
+    for no good reason a .txt would work just as well.
+    Files can group into chains and processed together or processed individually,
+    which is appropriate depends on how stable the silicon detectors were during
+    the course of the experiment.
+
+    TO USE:
+        - Run "cd ..../Si_calib"
+        - Run "gedit files.txt"
+        - Add list of files with full path
+        - Run "gedit Calib.cpp"
+        - Modify target, line 6
+        - Modify beam, detector distance and output directory, line 30 
+        - Run "root run_script.C"
+
+

@@ -1,0 +1,116 @@
+README
+Nikiroot 2.4
+James Smallcombe 22/02/2015 (27/02/22)
+james.smallcombe@outlook.com
+
+Ensure root is sourced before running "make"
+
+nikiwrapped takes the following command line options, all are optional. Example files are provided.
+
+	--FILE 	Input file
+		FILE should be an ascii file with relative or absolute path.
+		File should contain a whitespace delimitated list of input arguments.
+		These will be loaded sequentially as if given on the command line.
+		e.g "nikiwrapped --LIST_OF_COMMANDS.txt"
+
+------------		
+
+	-r#	Report Level
+		# should be a number 0-4
+		0=Silent running
+		1=Basic file reporting	DEFAULT
+		2=Buffer reporting
+		3=Buffer details
+		4=Individual event reporting
+		e.g. "nikiwrapped -r4"
+
+Trigger
+	-t#	Trigger Length
+		# should be an integer
+		This is the event size in DAQ time stamps, default is 200.
+		Use option -r4 to observe multiplicity and pileup.
+		e.g. "nikiwrapped -t100"
+		
+	-d#	Trigger Delay
+		# should be an integer
+		This is the delay between the start of an event and the trigger channel in DAQ time stamps, default is 0.
+		Use option -r4 to observe multiplicity and pileup.			
+		e.g. "nikiwrapped -d50"
+
+	-D#,#	DAQ triggers
+		# should integer
+		Input the DAQ channels that should be used as triggers.
+		DAQ channel numbers are given by N = module#*16 + channel#
+		-D# can be used multiple times or a comma deliminated list or a combination
+		e.g. "nikiwrapped -D3 -D56 -D12,14,15"
+
+	-E#,#	DAQ triggers Second Buffer
+		A second buffer with different triggers my be run simaltaniously to filter out uncorrelated detectors to more managable files.
+		THIS WILL REQUIRE DOUBLE THE MEMORY. Input is idential to the -D#,#
+
+	-X#	Second sort reduction
+		Specify how, and if, you wish to reduce the data rate from buffer two.
+		If X can either be given as the total number of events to collect from the start of a run
+		Or it can be given as a fracion and every 1/Nth data entry will be collected.
+		e.g. "nikiwrapped -X10000000 -X0.001"
+		
+Data		
+	-b#	Buffer size
+		# should be an integer
+		Size of the read in buffer, default 1,000,000.
+		Larger values may result in memory problems.
+		If set too small in many channel systems data for very low frequency channels may be lost.
+		Use option -r3 to monitor buffers.
+		e.g. "nikiwrapped -b100000"
+		
+	-B	Buffer size override 
+		With this option low channels are NEVER missed.
+		Every read will continue until all channels have data.
+		This is a very inefficient memory intensive alternative.
+		Any channels which are selected but empty will result in entire runs being read to buffer memory. USE WITH CAUTION.
+		e.g. "nikiwrapped -B"
+		
+	-Z	Timing Fault Zero Tolerance
+		When encountering a timing error the file will be terminated minimising the chance of a sort problem, but lose events.
+		Without this flag the default is to attempt to continue. This may have errors if there are empty channels.
+		Without this option beware memory expansion following time errors.
+		e.g. "nikiwrapped -Z"		
+
+	-T	Timing Data
+		Turns on timing branches of trees, redundant in current trigger mode, 
+		default is off
+		e.g. "nikiwrapped -T"
+		
+	-cFILE	Channel file
+		FILE should be an ascii file with relative or absolute path.
+		Gives names of active channels, should be a file containing a
+		whitespace delimitated list of channel numbers followed by a name.
+		DAQ channel numbers are given by N = module#*16 + channel#
+		NOTE If left blank channellist.txt will be generated (and overwritten)
+		in the current directory using the data.
+		e.g. "nikiwrapped -cLIST.txt"
+		
+Files		
+	-lPATH	Load path or list
+		PATH should contain either the path to the .dat files to be proceed
+		OR a .txt file containing whitespace delimitated list of files to process.
+		Files should be names should begin in the local convention RUN###_
+		e.g. "nikiwrapped -l/data/experiments/z90z90/"
+		e.g. "nikiwrapped -lFILES.txt"
+		
+	-sPATH	Save path
+		PATH should contain the save path.
+		If the folder does not exist it will be created.
+		e.g. "nikiwrapped -s/data/experiments/z90z90_presorted/"
+
+	-o	Overwrite
+		This must be included to overwrite output files.
+		If ommited one can point to a folder of data of which some runs have been sorted and these runs may be skipped.
+
+	
+
+Alternatively code may be run natively in root, a macro is provided to load the subroutines.
+
+NEW SECONDARY BUFFER
+A new feature has been added to run a second buffer with different trigger configurations 
+

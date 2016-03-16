@@ -1,0 +1,55 @@
+
+range is a front-end to various -dE/dx and range calculating functions.
+If you know what -dE/dx is you will have no problems running this
+program.
+
+The header and shared/static library needed to access two of the 
+functions are specially constructed to provide an easy calculation of 
+the energy loss of an ion after passage through a foil. This is 
+particularly useful in analyzes of nuclear physics experiments where 
+usually a projectile, or reaction products, loose energy in the target 
+material or dead layers in detectors and energy loss corrections are 
+needed. See manpage passage(3) for a detailed explanation of the 
+functions.
+
+The method of constructing range tables to interpolate to desired range
+values is due to Prof. Jan-Olov Liljenzin, Chalmers Institute of
+Technology, Sweden. The original program written in Fortran was
+inherited to me during my time as a Ph.D. student at Uppsala University. 
+Since the source code was not intended for the general public it was
+never copyrighted in any sense. I have taken the liberty to take parts
+of the original code, at least the spirit, port it to C and license it
+under GPL in the interest of a broader scientific community. Due
+acknowledgments to Prof. Jan-Olov Liljenzin, or JOL as we all know him.
+
+Calculations with range and the C functions passage() and egassap() are 
+done by constructing range tables according to the Northcliffe-Schilling 
+correlations [1] and Hubert-Bimbot-Gauvin correlations [2]. Both have a 
+range of validity. The Northcliffe-Schilling correlations are valid for 
+ion energies E/A < 12 MeV/A, and the Hubert-Bimbot-Gauvin correlations 
+for ion energies 2.5 < E/A < 100 MeV/A.
+
+[1] L.C. Northcliffe, R.F. Schilling, Nucl. Data Tables A7, 233 (1970).
+[2] F. Hubert, R. Rimbot and H. Gauvin, Atomic Data and Nuclear Data 
+    Tables 46, pp. 1-213 (1990).
+
+Density of gases
+----------------
+To express the density of a gas (at T=298 K) in terms of its pressure in 
+Torr:
+	density[mg/cm3] = P[Torr] x 5.38083e-5 x molecular weight
+
+The constant 5.38083e-5 can be deduced using the gas law at NTP. Gases
+are commonly used in ionization chambers.
+
+Density of solids
+-----------------
+Some useful densities of solids commonly used as target, backing or
+detector material,
+
+  C  : 2267 mg/cm3
+  Al : 2702 mg/cm3
+  Si : 2321 mg/cm3
+  Cu : 8920 mg/cm3
+  Au : 19310 mg/cm3
+  Th : 11658 mg/cm3

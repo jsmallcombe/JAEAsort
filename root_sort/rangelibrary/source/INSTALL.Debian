@@ -1,0 +1,13 @@
+range for Debian
+----------------
+
+In Debian systems, install devscripts, debhelper and fakeroot,
+
+# apt-get install devscripts debhelper fakeroot
+
+then,
+
+$ debuild binary
+$ sudo debi
+
+ -- Ricardo Yanez <Ricardo.Yanez@calel.org>, Mon, 17 Jan 2005 20:58:22 +1100

@@ -1,0 +1,24 @@
+Source: range
+Section: science
+Priority: optional
+Maintainer: Ricardo Yanez <ricardo.yanez@calel.org>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.6.1
+
+Package: range-dev
+Section: devel
+Architecture: any
+Depends: range (= ${Source-Version})
+Description: stopping power and range program (development files)
+ This package contains the header file and static version of the library
+ necessary for building C programs which use functions for calculating
+ energy loss of ions in absorber foils. It is intended for use in the
+ analysis of nuclear physics experiments. Some examples included.
+
+Package: range
+Section: science
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: stopping power and range program
+ This package contains the program range for calculating stopping power
+ and range of ions in absorber foils.

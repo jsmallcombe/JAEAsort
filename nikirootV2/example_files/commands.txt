@@ -1,0 +1,1 @@
+-r3 -cchannels_order_fixed.txt -s/home/smallcombe/data/Ir_Fiss_21Nov2014/y1y2 -l/media/smallcombe/Transcend/Ir_fiss_Nov2014/data/ -T -t11 -d3 -D66,69 -E0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 -X0.001
