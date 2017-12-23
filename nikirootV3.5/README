@@ -24,7 +24,14 @@ The earliest occurring trigger channel defines the‚Äù trigger time‚Äù for each s
 The trigger time minus the "Pre Trigger" defines the event start.
 The first hit of each channel occurring within "Trigger Length" elapsed ticks following the event start are collected into the current event.
 Any ADDITONAL hits occurring in a channel within the Trigger Length REMAIN to be triggers and data in subsequent events, these are no longer lost and "pile up" is no longer counted.
- 
+
+Offset Time
+
+Every channel can be given an offset time (in daq ticks) so that channels with large delays can be more easily correlated with their counterpart events.
+This offset is applied when the time is read from the buffer for triggering or event construction.
+If the delay is large or the rate in channels high these delayed channels from the same event could be on seperate daq reads, so be sure to increase ìBuffer DAQ reads safeì with the -B# flag.
+
+
 Commands
 
 nikiwrapped takes the following command line options, all are optional.
@@ -87,7 +94,7 @@ e.g. "nikiwrapped -T"
 	-cFILE	Channel file
 FILE should be an ascii file with relative or absolute path.
 Gives names of active channels, should be a file containing a
-whitespace delimitated list of channel numbers followed by a name.
+whitespace delimited list of channel numbers followed by a name and a time offset in ticks. e.g. "66 MWPC1_y 0"
 DAQ channel numbers are given by N = module#*16 + channel#
 NOTE If left blank channellist.txt will be generated (and overwritten) in the current directory using the data.
 e.g. "nikiwrapped -cLIST.txt"

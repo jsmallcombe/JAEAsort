@@ -1,5 +1,5 @@
-// Nikiroot 3.0
-// James Smallcombe 16/12/2016
+// Nikiroot 3.5
+// James Smallcombe 22/12/2017
 // james.smallcombe@outlook.com
 
 #ifndef __BUFFER_H_INCLUDED__   // if x.h hasn't been included yet...
@@ -31,8 +31,9 @@ class nikibuffer
 	int fDetail;
 	
 	// Methods
-	void AddChannel(int,bool);
-	void SetChannels(vector<int>,vector<int>);
+	void AddChannel(int daqchan,long long toffset=0,bool trig=false);
+	
+	void SetChannels(vector<int>,vector<long long>,vector<int>);
 	void SetWindow(long long length, long long pretrig){fTriggerLength=length;fPreTrigger=pretrig;}
 	void SetDAQSafe(int safe){DAQReadsSafe=safe;}	
 	
@@ -53,6 +54,7 @@ class nikibuffer
 	vector<bool> fChannelIsTrigger; //Is this buffer channel [i] a trigger channel
 	vector<long long> fPrevTime; //Timestamp of previous datum in buffer [i]	
 	vector< int > fDAQRead;
+	vector< long long > fTimeOffset;	
 	
 	vector< queue<int> > fDataBuffer;
 	vector< queue<long long> > fTimeBuffer;	

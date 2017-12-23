@@ -1,5 +1,5 @@
-// Nikiroot 2.4
-// James Smallcombe 22/02/2015 (27/02/22)
+// Nikiroot 3.5
+// James Smallcombe 22/12/2017
 // james.smallcombe@outlook.com
 
 #include <TApplication.h>
@@ -19,18 +19,15 @@ int main(int argc, char *argv[]){
 
 	int readoutdetail=1;
 	long long triggerlength=200;
-	long long triggerdelay=0;
+	long long pretrigger=0;
 	bool timeonoroff=false;
 	string addresses="";
 	string loadpath=".";
 	string savepath=".";
-	int readinbuffersize=1000000;
+	int readinbuffersize=1000;
+	int daqsafe=5;
 	vector<int> triggers;
-	vector<int> extra_triggers;
-	double lossfraction=1.0;
 	bool overwrite=false;
-	bool buffover=false;
-	bool zerotolerance=false;
 	
 	vector<string> inputs;
 	ifstream openfile;
@@ -48,15 +45,14 @@ int main(int argc, char *argv[]){
 			
 			if(bc=='r') strea>>readoutdetail;
 			if(bc=='t') strea>>triggerlength;
-			if(bc=='d') strea>>triggerdelay;
+			if(bc=='p') strea>>pretrigger;
 			if(bc=='T') timeonoroff=true;
 			if(bc=='c') addresses=arg;
 			if(bc=='l') loadpath=arg;
 			if(bc=='s') savepath=arg;
 			if(bc=='b') strea>>readinbuffersize;
 			if(bc=='o') overwrite=true;
-			if(bc=='B') buffover=true;
-			if(bc=='Z') zerotolerance=true;
+			if(bc=='B') strea>>daqsafe;
 			if(bc=='-'){
 				openfile.open(arg.c_str());
 				if(openfile.is_open()){
@@ -72,21 +68,10 @@ int main(int argc, char *argv[]){
 				while(is >> a)
 				triggers.push_back(a);
 			}
-			if(bc=='E'){
-				int a;
-				TString line=arg;
-				line.ReplaceAll(","," ");
-				istringstream is(line.Data());
-				while(is >> a)
-				extra_triggers.push_back(a);
-			}
-			if(bc=='X'){
-				strea>>lossfraction;
-			}
 		}
 	}
 
-	core(readoutdetail,triggerlength,triggerdelay,timeonoroff,addresses,loadpath,savepath,readinbuffersize,triggers,lossfraction,extra_triggers,overwrite,buffover,zerotolerance);
+	core(readoutdetail,triggerlength,pretrigger,timeonoroff,addresses,loadpath,savepath,readinbuffersize,triggers,overwrite,daqsafe);
 	
 // 	gSystem->ChangeDirectory(savepath.c_str());
 // 	TBrowser* broone=new TBrowser();

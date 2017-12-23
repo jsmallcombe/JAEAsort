@@ -1,5 +1,5 @@
-// Nikiroot 3.0
-// James Smallcombe 16/12/2016
+// Nikiroot 3.5
+// James Smallcombe 22/12/2017
 // james.smallcombe@outlook.com
 
 #include "nikirootinc.h"
@@ -112,7 +112,7 @@ vector<int> generate_addressmap(list<string> files,vector<string>& nam,bool outp
 }
 		
 		
-bool read_addressmap(vector<int>& chan,vector<string>& nam,string filen){
+bool read_addressmap(vector<int>& chan,vector<string>& nam,vector<long long>& time,string filen){
 
 	if(filen.size()<1) return false; 
 
@@ -122,9 +122,11 @@ bool read_addressmap(vector<int>& chan,vector<string>& nam,string filen){
 	
 	string ina;
 	int inb;
-	while(testfile>>inb && testfile>>ina){
+	long long inc;
+	while(testfile>>inb && testfile>>ina && testfile>>inc){
 		chan.push_back(inb);
 		nam.push_back(ina);
+		time.push_back(inc);
 	}
 	testfile.close();
 	

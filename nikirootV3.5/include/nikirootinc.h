@@ -1,5 +1,5 @@
-// Nikiroot 2.4
-// James Smallcombe 22/02/2015 (27/02/22)
+// Nikiroot 3.5
+// James Smallcombe 22/12/2017
 // james.smallcombe@outlook.com
 
 #ifndef __NTROOTINC_H_INCLUDED__   // if x.h hasn't been included yet...
@@ -27,7 +27,7 @@ list<string> make_file_list(string);
 
 vector<int> generate_addressmap(list<string>,vector<string>&,bool=false,int=100000);
 
-bool read_addressmap(vector<int>&,vector<string>&,string);
+bool read_addressmap(vector<int>&,vector<string>&,vector<long long>&,string);
 
 
 bool open_check_run(string&,ifstream&,list<string>&,int);

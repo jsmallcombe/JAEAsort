@@ -1,5 +1,5 @@
-// Nikiroot 3.0
-// James Smallcombe 16/12/2016
+// Nikiroot 3.5
+// James Smallcombe 22/12/2017
 // james.smallcombe@outlook.com
 
 #include "core_nikiroot.h"
@@ -20,6 +20,7 @@ void core(int readoutdetail,long long triggerlength,long long pretrigger, bool t
 	
 	vector<int> addressmap;
 	vector<string> buffername;
+	vector<long long> timeoffset;
 
 	gSystem->mkdir(savepath.c_str(),true);
 	
@@ -29,10 +30,11 @@ void core(int readoutdetail,long long triggerlength,long long pretrigger, bool t
 
 	  
 	if(readoutdetail>0)cout<<endl<<"Reading address map.";	  
-	if(!read_addressmap(addressmap,buffername,addresses)){//if no manual address map given
+	if(!read_addressmap(addressmap,buffername,timeoffset,addresses)){//if no manual address map given
 		if(readoutdetail>0)cout<<endl<<"Read failed, building address map from data files.";
 		if(readoutdetail>2)addressmap=generate_addressmap(filelist,buffername,true);
 		else addressmap=generate_addressmap(filelist,buffername);
+		timeoffset.resize(addressmap.size(),1);
 	}
 	
 	//
@@ -42,7 +44,7 @@ void core(int readoutdetail,long long triggerlength,long long pretrigger, bool t
 	nikibuffer peakdatabuffer;
 	
 	if(readoutdetail>0) cout<<endl<<"Building buffers.";
-	peakdatabuffer.SetChannels(addressmap,triggers);
+	peakdatabuffer.SetChannels(addressmap,timeoffset,triggers);
 	peakdatabuffer.SetWindow(triggerlength,pretrigger);
 	
 	peakdatabuffer.SetDAQSafe(daqsafe);

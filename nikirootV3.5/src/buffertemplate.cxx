@@ -1,5 +1,5 @@
-// Nikiroot 3.0
-// James Smallcombe 16/12/2016
+// Nikiroot 3.5
+// James Smallcombe 22/12/2017
 // james.smallcombe@outlook.com
 
 #include "buffertemplate.h"
@@ -19,7 +19,7 @@ void nikibuffer::ResetBufferLists(){
 	fDAQRead.resize(1,0);
 	fDataBuffer.resize(1);
 	fTimeBuffer.resize(1);
-	
+	fTimeOffset.resize(1);
 	fDAQaddresses.resize(1,0);
 	fChannelIsTrigger.resize(1,false);
 	fPrevTime.resize(1,-1);
@@ -30,9 +30,10 @@ void nikibuffer::ResetBufferLists(){
 int nikibuffer::size(){	return fBufferLength;}
 
 //Add everything needed for an additional channel
-void nikibuffer::AddChannel(int daqchan,bool trig){
+void nikibuffer::AddChannel(int daqchan,long long toffset,bool trig){
 		fDataBuffer.push_back(queue<int>());
 		fTimeBuffer.push_back(queue<long long>());
+		fTimeOffset.push_back(toffset);
 		fDAQRead.push_back(fTotalDAQReads);
 		fPrevTime.push_back(-1);
 		fChannelIsTrigger.push_back(trig);
@@ -44,16 +45,18 @@ void nikibuffer::AddChannel(int daqchan,bool trig){
 }
 
 //Add a list of buffer channels rather than individually
-void nikibuffer::SetChannels(vector<int> orderedlist,vector<int> triglist){	
+void nikibuffer::SetChannels(vector<int> orderedlist,vector<long long> toffset,vector<int> triglist){	
 	this->ResetBufferLists();
 	
 	for(int i=0;(unsigned)i<orderedlist.size();i++){
 		bool trig=false;
 		if(triglist.size()==0)trig=true;
 		else for(int j=0;(unsigned)j<triglist.size();j++)if(triglist[j]==orderedlist[i])trig=true;
-		this->AddChannel(orderedlist[i],trig);
+		this->AddChannel(orderedlist[i],toffset[i],trig);
 	}
 }
+
+
 
 // Clear all datat from the specified buffer
 int nikibuffer::WipeSingleBuffer(int i){
@@ -173,7 +176,8 @@ bool nikibuffer::GetChan(int i,int& Value,long long& Time){
 		if(!this->PopChan(i))return false;
 	}
 	Value=fDataBuffer[i].front();
-	Time=fTimeBuffer[i].front();
+	Time=fTimeBuffer[i].front()+fTimeOffset[i];
+	if(Time<0)Time=0;//Because negative values denote daq reads
 	return true;
 }
 

@@ -1,5 +1,5 @@
-// Nikiroot 3.0
-// James Smallcombe 16/12/2016
+// Nikiroot 3.5
+// James Smallcombe 22/12/2017
 // james.smallcombe@outlook.com
 
 #ifndef __CORE_H_INCLUDED__   // if x.h hasn't been included yet...
