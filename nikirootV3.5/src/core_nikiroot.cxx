@@ -169,14 +169,14 @@ cout<<endl<<endl<<"Start time "<<tp.tv_sec * 1000 + tp.tv_usec / 1000<<endl<<end
 				openfile.close();
 			}
 			if(readoutdetail>0)cout<<"."<<flush;
-			if(readoutdetail>1)cout<<endl<<"NUMBER OF EVENTS THIS RUN : "<<mytree->GetEntries();
+			if(readoutdetail>1)cout<<endl<<"NUMBER OF EVENTS THIS RUN : "<<mytree->GetEntries()<<flush;
 		}
 
 		//
 		// WHEN A EVENTS ARE TO BE CONSTRUCTED
 		// Care is taken to maintain time across reads and files.
 		//
-
+		
 		int multiplicity=0;
 		if(openfile.is_open()){
 			while(peakdatabuffer.MakeEvent(event,eventtimes,multiplicity)){

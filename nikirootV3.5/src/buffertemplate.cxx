@@ -23,6 +23,7 @@ void nikibuffer::ResetBufferLists(){
 	fDAQaddresses.resize(1,0);
 	fChannelIsTrigger.resize(1,false);
 	fPrevTime.resize(1,-1);
+	fBufferLength=0;
 }
 
 // Methods
@@ -57,7 +58,6 @@ void nikibuffer::SetChannels(vector<int> orderedlist,vector<long long> toffset,v
 }
 
 
-
 // Clear all datat from the specified buffer
 int nikibuffer::WipeSingleBuffer(int i){
 	if(i>fBufferLength)return 0;
@@ -87,7 +87,7 @@ bool nikibuffer::FillBuffers(ifstream& openfile,int readinbuffersize){
 	
 	this->IterateDAQreads();
 	
-	int CurrentCard=0;
+	int CurrentCard=0; 
 
 	while(line.ReadLine(openfile)&&readcount>0) {
 		line.ReplaceAll(","," ");
@@ -144,11 +144,17 @@ int nikibuffer::EarliestDAQread(){
 bool nikibuffer::PopChan(int i){
 	if(i>fBufferLength)return false;
 	
-	//pops until actual data or end of buffer and updates DAQread marker
+	//Returns false if out of data
+	if(fDataBuffer[i].size()==0)return false;
+			
 	fDataBuffer[i].pop();
 	fTimeBuffer[i].pop();
-	while(fDataBuffer[i].size()>0&&fDataBuffer[i].front()<0){
-		fDAQRead[i]=fDataBuffer[i].front();
+	
+	//pops until actual data or end of buffer and updates DAQread marker
+	while(fDataBuffer[i].size()>0){
+		if(fDataBuffer[i].front()<0)fDAQRead[i]=fDataBuffer[i].front();
+		else break;
+		
 		fDataBuffer[i].pop();
 		fTimeBuffer[i].pop();
 	}
@@ -176,15 +182,17 @@ bool nikibuffer::GetChan(int i,int& Value,long long& Time){
 		if(!this->PopChan(i))return false;
 	}
 	Value=fDataBuffer[i].front();
-	Time=fTimeBuffer[i].front()+fTimeOffset[i];
+	Time=fTimeBuffer[i].front();
 	if(Time<0)Time=0;//Because negative values denote daq reads
+	Time+=fTimeOffset[i];
 	return true;
 }
 
 
 bool nikibuffer::GetTrigger(int& TrigDAQ,long long& TrigTime){
 	//
-	// This establishes the earliest trigger and also if any of the channels have run out of data too early relative to the trigger
+	// This establishes the earliest trigger
+	// and also if any of the channels have run out of data too early relative to the trigger
 	//
 	int EarliestReadRequest=fTotalDAQReads;
 	long long TriggerT=0;
@@ -227,13 +235,14 @@ bool nikibuffer::PopAllTillGood(){
 
 bool nikibuffer::MakeEvent(vector<int>& event,vector<int>& eventtime,int& multiplicity){	
 	multiplicity=0;
+	
 	for(int i=0;i<fBufferLength;i++){
 		event[i]=0;
 		eventtime[i]=0;
 	}
-		
+	
 	if(!PopAllTillGood())return false;
-
+	
 	int TrigDAQ;
 	long long TrigTime,TrigStart,TrigEnd;
 	
@@ -261,21 +270,21 @@ bool nikibuffer::MakeEvent(vector<int>& event,vector<int>& eventtime,int& multip
 
 	//If we still havent returned by this point we have:
 	//Established a trigger
-	//Established any channels needing reads are way after the trigger
-	//Popped all data before the start of trigger
+	//Established any channels needing reads are significantly after the trigger
+	//Popped all data from before the start of trigger window
 
 	//Now we check if during any of the poping we found a time stamp error (and fix it if possible)
 	if(!PopAllTillGood())return false;
 
 	for(int i=1;i<=fBufferLength;i++){
 		int V;long long T=0;
-		if(!GetChan(i,V,T))return false;
+		if(GetChan(i,V,T)){
 		if(T<TrigEnd){
 			event[i-1]=V;
 			eventtime[i-1]=T-TrigTime;
 			multiplicity++;
 			PopChan(i);
-		}
+		}}
 	}
 	
 	return true;
@@ -291,7 +300,8 @@ void nikibuffer::Print(){
 		}
 		cout<<fDAQRead[i]<<" ";
 		cout<<fDataBuffer[i].size()<<" ";
-		cout<<fTimeBuffer[i].front()<<" ";
+		if(fTimeBuffer[i].size())cout<<fTimeBuffer[i].front()<<" ";
+		else cout<<fPrevTime[i]<<" ";
 		cout<<endl;
 	}
 }
