@@ -178,7 +178,7 @@ cout<<endl<<endl<<"Start time "<<tp.tv_sec * 1000 + tp.tv_usec / 1000<<endl<<end
 		//
 		
 		int multiplicity=0;
-		if(openfile.is_open()){
+		if(openfile.is_open()||!datafilesremain){
 			while(peakdatabuffer.MakeEvent(event,eventtimes,multiplicity)){
 				if(multiplicity>0){
 					mytree->Fill();

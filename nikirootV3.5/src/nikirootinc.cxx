@@ -104,7 +104,7 @@ vector<int> generate_addressmap(list<string> files,vector<string>& nam,bool outp
 			buffername<<i;
 			nam.push_back("chan_"+buffername.str());
 			if(output)cout<<i<<", ";
-			ofs<<i<<" "<<"chan_"+buffername.str()<<endl;
+			ofs<<i<<" "<<"chan_"+buffername.str()<<" 0"<<endl;
 		}
 	}
 		
